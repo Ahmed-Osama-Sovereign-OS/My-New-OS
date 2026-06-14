@@ -1,27 +1,5 @@
-name: Build-OS
-on: [push]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout-Code
-        uses: actions/checkout@v3
-
-      - name: Setup-and-Inject-Identity
+- name: Inject-Smart-Storage
         run: |
-          wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.9.tar.xz
-          tar -xf linux-6.9.tar.xz
-          mv linux-6.9 kernel_source
-          
-          # حقن كود الفيزياء
-          cp physics_patch.c kernel_source/kernel/sched/physics_patch.c
-          
-          # حقن كود الاسم
-          cp boot_name.c kernel_source/init/boot_name.c
-          
-          # إضافة الاستدعاء في ملف الإقلاع الرئيسي
-          echo "extern void print_os_banner(void);" >> kernel_source/init/main.c
-          sed -i '/start_kernel(void);/a \    print_os_banner();' kernel_source/init/main.c
-          
-          echo "تمت إضافة اسم أحمد أسامة بنجاح إلى شاشة الإقلاع!"
+          cp smart_storage.c kernel_source/fs/smart_storage.c
+          # استدعاء دالة التحسين في نظام الملفات الافتراضي
+          sed -i 's/vfs_read/optimize_storage_layout(file); vfs_read/g' kernel_source/fs/read_write.c
