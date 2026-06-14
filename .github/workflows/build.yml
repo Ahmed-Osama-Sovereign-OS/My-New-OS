@@ -8,9 +8,16 @@ jobs:
       - name: Checkout-Code
         uses: actions/checkout@v3
 
-      - name: Download-Kernel
+      - name: Setup-and-Patch
         run: |
-          echo "جاري تحميل كود النواة يا أحمد..."
+          # 1. تحميل وفك النواة
           wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.9.tar.xz
           tar -xf linux-6.9.tar.xz
-          ls -F
+          mv linux-6.9 kernel_source
+          
+          # 2. دمج كود الفيزياء الخاص بك في قلب النواة
+          cp physics_patch.c kernel_source/kernel/sched/physics_patch.c
+          
+          # 3. إظهار النتيجة للتأكد
+          echo "تم حقن قوانين الفيزياء بنجاح في نواة النظام!"
+          ls -l kernel_source/kernel/sched/physics_patch.c
