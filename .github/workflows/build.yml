@@ -8,16 +8,20 @@ jobs:
       - name: Checkout-Code
         uses: actions/checkout@v3
 
-      - name: Setup-and-Patch
+      - name: Setup-and-Inject-Identity
         run: |
-          # 1. تحميل وفك النواة
           wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.9.tar.xz
           tar -xf linux-6.9.tar.xz
           mv linux-6.9 kernel_source
           
-          # 2. دمج كود الفيزياء الخاص بك في قلب النواة
+          # حقن كود الفيزياء
           cp physics_patch.c kernel_source/kernel/sched/physics_patch.c
           
-          # 3. إظهار النتيجة للتأكد
-          echo "تم حقن قوانين الفيزياء بنجاح في نواة النظام!"
-          ls -l kernel_source/kernel/sched/physics_patch.c
+          # حقن كود الاسم
+          cp boot_name.c kernel_source/init/boot_name.c
+          
+          # إضافة الاستدعاء في ملف الإقلاع الرئيسي
+          echo "extern void print_os_banner(void);" >> kernel_source/init/main.c
+          sed -i '/start_kernel(void);/a \    print_os_banner();' kernel_source/init/main.c
+          
+          echo "تمت إضافة اسم أحمد أسامة بنجاح إلى شاشة الإقلاع!"
